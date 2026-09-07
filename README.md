@@ -81,3 +81,27 @@ The dev server reads `app/public/executions.json` (currently an empty
 array as a placeholder) — drop some sample records in there matching the
 schema used in `data/executions.json` if you want to preview the chart
 with data before the first real run happens.
+
+---
+
+## Design notes & origin (conversation summary)
+
+This project was originally assembled in response to a design described by the repository owner. The key points and rationale from that conversation are recorded here to help future maintainers and agentic AIs understand design trade-offs and setup steps.
+
+- Design decision: the "database" is an append-only JSON file (`data/executions.json`) committed back to the repository by the GitHub Action. GitHub Pages is static hosting and has no backend, so using a JSON file is the simplest, git-diffable, and easily consumable format for a Vite static site. An alternative (SQLite read client-side via sql.js) was considered but JSON was chosen for simplicity and transparency.
+
+- How it works (summary):
+  - `.github/workflows/record-execution.yml` runs daily at `03:14 UTC` (cron `14 3 * * *`) and on manual `workflow_dispatch`. It runs `scripts/record_execution.py` which calculates the actual execution timestamp, computes delay vs scheduled time, and appends a record to `data/executions.json`. The workflow commits and pushes the updated JSON back to the repo.
+  - `.github/workflows/deploy-pages.yml` rebuilds the Vite/React dashboard and deploys it to GitHub Pages whenever `data/executions.json` (or the `app/` source) changes.
+  - `app/` is a Vite + React dashboard that reads the JSON at build time and renders a bar chart of delays.
+
+- Confirmed behaviors:
+  - Records append properly and delay computation (scheduled vs manual) is implemented; manual runs are tagged (no delay computed).
+  - The Python script's delay-calculation logic has been tested and produces sensible records for both scheduled and manual runs.
+
+- Required manual setup steps (recap):
+  1. Set Actions → General → Workflow permissions to "Read and write permissions" so the action can commit `data/executions.json`.
+  2. Set Pages source to "GitHub Actions" in Settings → Pages so `deploy-pages.yml` can publish the dashboard.
+  3. Run `npm install` once inside `app/` locally and commit `package-lock.json` (deploy workflow uses `npm ci` and requires the lockfile).
+
+If you want the conversation transcript or full original text added verbatim to the repo (for provenance), tell me and I will add it to a new file (e.g., ORIGIN.md).
