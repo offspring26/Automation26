@@ -1,0 +1,50 @@
+name: Record Scheduled Execution
+
+# Runs every day at 03:14 UTC, and can also be triggered manually.
+# NOTE: GitHub Actions cron schedules run in UTC and are best-effort —
+# under load, actual start time can slip by minutes. That slip is exactly
+# what this workflow measures.
+on:
+  schedule:
+    - cron: '14 3 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: record-execution
+  cancel-in-progress: false
+
+jobs:
+  record:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Record this execution
+        env:
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+          GITHUB_RUN_ATTEMPT: ${{ github.run_attempt }}
+        run: python3 scripts/record_execution.py
+
+      - name: Commit and push updated log
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/executions.json
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore(data): record execution $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            git push
+          fi
