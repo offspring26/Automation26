@@ -15,6 +15,18 @@ Repository / runtime summary
 - Dashboard: app/ — Vite + React; reads executions.json at build time and is published to GitHub Pages by .github/workflows/deploy-pages.yml.
 - Data: data/executions.json — append-only log committed by CI. Treat this file as canonical historical data.
 
+Setup Status (as of 2026-09-07)
+-------------------------------
+✅ **All core infrastructure is fully operational:**
+- Workflow permissions set to "Read and write" (allows data commits by bot)
+- GitHub Pages source configured to "GitHub Actions"
+- npm dependencies locked via app/package-lock.json
+- First execution record logged (manual dispatch on 2026-09-07 at 10:30:10 UTC)
+- Dashboard deployed and live at https://offspring26.github.io/Automation26/
+- Next scheduled run: 2026-09-08 at 03:14 UTC (expected to start recording live delay data)
+
+See **STATUS.md** for detailed setup completion report, workflow diagrams, and testing notes.
+
 Agent constraints and safety rules
 - Do NOT rewrite or reorder data/executions.json. All changes to this file should be append-only and committed with clear provenance.
 - Avoid changing historical commits. If data needs correction, open an issue and propose a documented migration, or add a new compensating record — do not alter past records in-place.
@@ -42,7 +54,7 @@ Testing and local development
   The dev server reads app/public/executions.json. Place sample records there to preview the chart.
 
 Permissions and secrets
-- No secret or private credentials are stored in this repo. The workflows run on GitHub Actions and use the default GITHUB_TOKEN to push commits. Do not attempt to add long-lived tokens or secrets to automate commits without explicit human approval.
+- No secret or private credentials are stored in this repo. The workflows run on GitHub Actions and use the default GITHUB_TOKEN to push commits. Do not attempt to add long-lived tokens or secrets.
 
 Observability and debugging
 - Check Actions logs for both workflows (.github/workflows/record-execution.yml and deploy-pages.yml) if something fails.
