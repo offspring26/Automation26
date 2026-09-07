@@ -2,6 +2,8 @@
 
 ![GitHub License](https://img.shields.io/github/license/offspring26/Automation26)
 ![GitHub Release](https://img.shields.io/github/v/release/offspring26/Automation26)
+[![Record Scheduled Execution](https://github.com/offspring26/Automation26/actions/workflows/record-execution.yml/badge.svg)](https://github.com/offspring26/Automation26/actions/workflows/record-execution.yml)
+[![Deploy Pages](https://github.com/offspring26/Automation26/actions/workflows/deploy-pages.yml/badge.svg)](https://github.com/offspring26/Automation26/actions/workflows/deploy-pages.yml)
 
 Every day at **03:14 UTC**, a GitHub Action runs, records the exact time it
 actually started (cron start times drift under load — that's the point of
