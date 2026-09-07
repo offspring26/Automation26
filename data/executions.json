@@ -1,1 +1,10 @@
-[]
+[
+  {
+    "run_id": "34111754904",
+    "run_attempt": "1",
+    "trigger": "workflow_dispatch",
+    "actual_time_utc": "2026-09-07T10:30:10.190949+00:00",
+    "scheduled_time_utc": null,
+    "delay_seconds": null
+  }
+]
