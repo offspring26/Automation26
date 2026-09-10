@@ -1,12 +1,10 @@
 name: Deploy updated Pages
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'data/executions.json'
-      - 'app/**'
-      - '.github/workflows/deploy-pages.yml'
+  workflow_run:
+    workflows: ["Record Scheduled Execution"]
+    types:
+      - completed
   workflow_dispatch:
 
 permissions:
@@ -20,6 +18,7 @@ concurrency:
 
 jobs:
   build:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
