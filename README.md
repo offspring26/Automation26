@@ -15,6 +15,8 @@ A second workflow rebuilds a small Vite/React dashboard and deploys it to
 GitHub Pages every time the data changes, showing a bar chart of delay (in
 minutes) per scheduled run.
 
+The layout obviously needs some updates.
+
 ## Repo layout
 
 ```
