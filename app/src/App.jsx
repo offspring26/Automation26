@@ -24,17 +24,35 @@ function formatTimeLabel(isoString) {
   })
 }
 
+function formatDateLabel(isoString) {
+  return new Date(isoString).toLocaleDateString(undefined, {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  })
+}
+
 function CustomTooltip({ active, payload }) {
   if (!active || !payload || !payload.length) return null
   const record = payload[0].payload
   return (
-    <div className="tooltip">
-      <div className="tooltip-title">{formatTimeLabel(record.actual_time_utc)}</div>
-      <div>Trigger: {record.trigger === 'schedule' ? 'Scheduled' : 'Manual dispatch'}</div>
+    <div className="tooltip" role="status">
+      <div className="tooltip-title">{formatDateLabel(record.actual_time_utc)}</div>
+      <div className="tooltip-time">{formatTimeLabel(record.actual_time_utc)}</div>
+      <div className="tooltip-row">
+        <span>Trigger</span>
+        <strong>{record.trigger === 'schedule' ? 'Scheduled' : 'Manual dispatch'}</strong>
+      </div>
       {record.trigger === 'schedule' && (
         <>
-          <div>Scheduled for: 03:14 UTC</div>
-          <div>Delay: {record.delayMinutesLabel}</div>
+          <div className="tooltip-row">
+            <span>Scheduled for</span>
+            <strong>03:14 UTC</strong>
+          </div>
+          <div className="tooltip-row">
+            <span>Delay</span>
+            <strong>{record.delayMinutesLabel}</strong>
+          </div>
         </>
       )}
     </div>
@@ -70,6 +88,7 @@ export default function App() {
   }, [records])
 
   const scheduledOnly = chartData.filter((r) => r.trigger === 'schedule')
+  const manualCount = chartData.length - scheduledOnly.length
 
   const stats = useMemo(() => {
     if (!scheduledOnly.length) return null
@@ -82,14 +101,36 @@ export default function App() {
 
   return (
     <div className="page">
-      <header>
-        <h1>Automation26 — Execution Timing</h1>
-        <p className="subtitle">
-          Target: every day at <strong>03:14 UTC</strong>. Bars show how many
-          minutes late each scheduled run actually started. Manual
-          (workflow_dispatch) runs are shown in grey with no delay measured.
-        </p>
+      <header className="hero">
+        <div>
+          <p className="eyebrow">AUTOMATION26 / OPERATIONS</p>
+          <h1>Execution timing</h1>
+          <p className="subtitle">
+            A daily view of how reliably the scheduled workflow starts at its
+            03:14 UTC target.
+          </p>
+        </div>
+        <div className="schedule-badge">
+          <span className="status-dot" />
+          <span>Daily schedule</span>
+          <strong>03:14 UTC</strong>
+        </div>
       </header>
+
+      <section className="intro-panel" aria-label="Dashboard summary">
+        <div>
+          <span className="panel-kicker">RUN HISTORY</span>
+          <p>
+            Bars show the delay before each scheduled run started. Manual
+            workflow dispatches are retained for context and shown in grey.
+          </p>
+        </div>
+        {records && (
+          <span className="record-count">
+            {records.length} {records.length === 1 ? 'record' : 'records'}
+          </span>
+        )}
+      </section>
 
       {error && <div className="error">Couldn't load execution data: {error}</div>}
 
@@ -120,36 +161,50 @@ export default function App() {
             <span className="stat-value">{stats.max.toFixed(1)}m</span>
             <span className="stat-label">max delay</span>
           </div>
+          <div className="stat stat-muted">
+            <span className="stat-value">{manualCount}</span>
+            <span className="stat-label">manual runs</span>
+          </div>
         </div>
       )}
 
       {chartData.length > 0 && (
-        <div className="chart-wrap">
-          <ResponsiveContainer width="100%" height={420}>
+        <section className="chart-card" aria-label="Execution delay chart">
+          <div className="chart-heading">
+            <div>
+              <h2>Delay by execution</h2>
+              <p>Minutes between the target and actual start time</p>
+            </div>
+            <div className="chart-key">
+              <span><i className="key-swatch scheduled" /> Scheduled</span>
+              <span><i className="key-swatch manual" /> Manual</span>
+            </div>
+          </div>
+          <div className="chart-wrap">
+          <ResponsiveContainer width="100%" height={Math.max(360, chartData.length * 48)}>
             <BarChart
               data={chartData}
               layout="vertical"
-              margin={{ top: 16, right: 16, left: 200, bottom: 16 }}
+              margin={{ top: 12, right: 24, left: 12, bottom: 28 }}
+              barCategoryGap="28%"
             >
-              <CartesianGrid strokeDasharray="3 3" stroke="#2a2a2a" />
+              <CartesianGrid strokeDasharray="3 3" stroke="#29303d" horizontal={false} />
               <XAxis
                 type="number"
-                tick={{ fontSize: 11, fill: '#999' }}
-                label={{ value: 'Delay (minutes)', position: 'bottom', fill: '#999' }}
+                tick={{ fontSize: 11, fill: '#8490a3' }}
+                axisLine={{ stroke: '#394354' }}
+                tickLine={false}
+                label={{ value: 'Delay (minutes)', position: 'bottom', fill: '#8490a3', fontSize: 11 }}
               />
               <YAxis
                 dataKey="label"
                 type="category"
-                width={190}
-                tick={{ fontSize: 11, fill: '#999' }}
+                width={132}
+                tick={{ fontSize: 11, fill: '#b7c0cf' }}
+                axisLine={false}
+                tickLine={false}
               />
               <Tooltip content={<CustomTooltip />} />
-              <Legend
-                payload={[
-                  { value: 'Scheduled run', type: 'square', color: SCHEDULE_COLOR },
-                  { value: 'Manual dispatch (no delay measured)', type: 'square', color: DISPATCH_COLOR },
-                ]}
-              />
               <Bar dataKey="delayMinutes" name="Delay (minutes)">
                 {chartData.map((entry, i) => (
                   <Cell
@@ -160,7 +215,8 @@ export default function App() {
               </Bar>
             </BarChart>
           </ResponsiveContainer>
-        </div>
+          </div>
+        </section>
       )}
     </div>
   )
