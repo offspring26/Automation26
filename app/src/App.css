@@ -1,5 +1,6 @@
 :root {
   color-scheme: dark;
+  font-synthesis: none;
 }
 
 * {
@@ -8,76 +9,236 @@
 
 body {
   margin: 0;
-  background: #111214;
+  background: #0d1117;
   color: #eaeaea;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 .page {
-  max-width: 960px;
+  max-width: 1120px;
   margin: 0 auto;
-  padding: 32px 20px 60px;
+  padding: 56px 32px 72px;
 }
 
-header h1 {
-  font-size: 1.5rem;
-  margin-bottom: 4px;
+.hero {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 28px;
+  margin-bottom: 32px;
+}
+
+.eyebrow,
+.panel-kicker {
+  color: #8290a5;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  margin: 0 0 12px;
+}
+
+.hero h1 {
+  font-size: clamp(2rem, 4vw, 3rem);
+  letter-spacing: -0.04em;
+  line-height: 1;
+  margin: 0;
 }
 
 .subtitle {
-  color: #9a9a9a;
+  color: #99a5b7;
+  font-size: 1rem;
+  line-height: 1.6;
+  margin: 16px 0 0;
+  max-width: 560px;
+}
+
+.schedule-badge {
+  align-items: center;
+  background: #151d2a;
+  border: 1px solid #26364c;
+  border-radius: 999px;
+  color: #b6c4d8;
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 0.78rem;
+  gap: 8px;
+  padding: 9px 14px;
+  white-space: nowrap;
+}
+
+.schedule-badge strong {
+  color: #f2f6fb;
+  font-weight: 600;
+}
+
+.status-dot {
+  background: #45d19a;
+  border-radius: 50%;
+  box-shadow: 0 0 0 4px rgba(69, 209, 154, 0.12);
+  height: 7px;
+  width: 7px;
+}
+
+.intro-panel {
+  align-items: center;
+  background: linear-gradient(115deg, #151d2a, #131923);
+  border: 1px solid #25344a;
+  border-radius: 14px;
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 24px;
+  padding: 20px 24px;
+}
+
+.intro-panel p {
+  color: #aeb9c9;
   font-size: 0.9rem;
-  max-width: 640px;
-  line-height: 1.5;
+  line-height: 1.55;
+  margin: 0;
+  max-width: 720px;
+}
+
+.record-count {
+  color: #d5deeb;
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
 }
 
 .stats {
   display: flex;
-  gap: 24px;
-  margin: 28px 0;
+  gap: 12px;
+  margin: 0 0 24px;
   flex-wrap: wrap;
 }
 
 .stat {
-  background: #1a1b1e;
-  border: 1px solid #2a2a2a;
+  background: #141a23;
+  border: 1px solid #222c3b;
   border-radius: 10px;
-  padding: 14px 20px;
-  min-width: 110px;
-  text-align: center;
+  flex: 1 1 130px;
+  min-width: 120px;
+  padding: 16px 18px;
 }
 
 .stat-value {
   display: block;
-  font-size: 1.4rem;
-  font-weight: 600;
+  color: #f2f6fb;
+  font-size: 1.35rem;
+  font-weight: 700;
 }
 
 .stat-label {
   display: block;
-  font-size: 0.75rem;
-  color: #9a9a9a;
+  color: #8490a3;
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
   margin-top: 4px;
+  text-transform: uppercase;
+}
+
+.stat-muted .stat-value,
+.stat-muted .stat-label {
+  color: #a3aab6;
+}
+
+.chart-card {
+  background: #121821;
+  border: 1px solid #222c3b;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.chart-heading {
+  align-items: center;
+  border-bottom: 1px solid #222c3b;
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 22px 24px 18px;
+}
+
+.chart-heading h2 {
+  font-size: 1rem;
+  margin: 0;
+}
+
+.chart-heading p {
+  color: #8490a3;
+  font-size: 0.78rem;
+  margin: 6px 0 0;
+}
+
+.chart-key {
+  color: #9da9ba;
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 0.72rem;
+  gap: 14px;
+}
+
+.chart-key span {
+  align-items: center;
+  display: inline-flex;
+  gap: 6px;
+}
+
+.key-swatch {
+  border-radius: 3px;
+  display: inline-block;
+  height: 8px;
+  width: 8px;
+}
+
+.key-swatch.scheduled {
+  background: #4f7cff;
+}
+
+.key-swatch.manual {
+  background: #737e8e;
 }
 
 .chart-wrap {
-  background: #17181a;
-  border: 1px solid #2a2a2a;
-  border-radius: 12px;
-  padding: 16px;
+  padding: 12px 24px 20px 8px;
 }
 
 .tooltip {
-  background: #1f2023;
-  border: 1px solid #333;
+  background: #1b2431;
+  border: 1px solid #3a4a60;
   border-radius: 8px;
-  padding: 8px 12px;
-  font-size: 0.8rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  color: #c9d3e1;
+  font-size: 0.78rem;
+  min-width: 190px;
+  padding: 12px 14px;
 }
 
 .tooltip-title {
+  color: #f2f6fb;
   font-weight: 600;
-  margin-bottom: 4px;
+}
+
+.tooltip-time {
+  color: #8490a3;
+  font-size: 0.7rem;
+  margin: 3px 0 10px;
+}
+
+.tooltip-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  line-height: 1.7;
+}
+
+.tooltip-row span {
+  color: #98a6b8;
+}
+
+.tooltip-row strong {
+  color: #e6edf5;
+  font-weight: 600;
 }
 
 .error {
@@ -87,6 +248,45 @@ header h1 {
 
 .loading,
 .empty {
-  color: #9a9a9a;
+  background: #141a23;
+  border: 1px solid #222c3b;
+  border-radius: 10px;
+  color: #aeb9c9;
   margin: 24px 0;
+  padding: 18px 20px;
+}
+
+@media (max-width: 640px) {
+  .page {
+    padding: 32px 16px 48px;
+  }
+
+  .hero,
+  .intro-panel,
+  .chart-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .hero {
+    gap: 20px;
+  }
+
+  .schedule-badge {
+    white-space: normal;
+  }
+
+  .intro-panel {
+    gap: 14px;
+    padding: 18px;
+  }
+
+  .chart-heading {
+    gap: 14px;
+    padding: 18px;
+  }
+
+  .chart-wrap {
+    padding: 8px 12px 16px 0;
+  }
 }
