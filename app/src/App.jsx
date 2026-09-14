@@ -126,18 +126,21 @@ export default function App() {
       {chartData.length > 0 && (
         <div className="chart-wrap">
           <ResponsiveContainer width="100%" height={420}>
-            <BarChart data={chartData} margin={{ top: 16, right: 16, left: 8, bottom: 60 }}>
+            <BarChart
+              data={chartData}
+              layout="vertical"
+              margin={{ top: 16, right: 16, left: 200, bottom: 16 }}
+            >
               <CartesianGrid strokeDasharray="3 3" stroke="#2a2a2a" />
               <XAxis
-                dataKey="label"
-                angle={-40}
-                textAnchor="end"
-                interval={0}
-                height={80}
+                type="number"
                 tick={{ fontSize: 11, fill: '#999' }}
+                label={{ value: 'Delay (minutes)', position: 'bottom', fill: '#999' }}
               />
               <YAxis
-                label={{ value: 'Delay (minutes)', angle: -90, position: 'insideLeft', fill: '#999' }}
+                dataKey="label"
+                type="category"
+                width={190}
                 tick={{ fontSize: 11, fill: '#999' }}
               />
               <Tooltip content={<CustomTooltip />} />
