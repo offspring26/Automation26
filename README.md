@@ -21,13 +21,17 @@ The layout obviously needs some updates. But no problem, I contribute ...
 
 ```
 .github/workflows/
-  record-execution.yml   # cron '14 3 * * *' + workflow_dispatch → appends to data/executions.json
-  deploy-pages.yml       # on push to data/executions.json or app/** → builds + deploys app/
+  record-execution.yml    # cron '14 3 * * *' + workflow_dispatch → appends to data/executions.json
+  deploy-pages.yml        # on push to data/executions.json or app/** → builds + deploys app/
 scripts/
-  record_execution.py    # computes actual vs scheduled time, appends the record
+  record_execution.py     # computes actual vs scheduled time, appends the record
 data/
-  executions.json        # the "database" — append-only JSON log, committed by CI
+  executions.json         # the "database" — append-only JSON log, committed by CI
 app/                      # Vite + React dashboard, fetches data/executions.json at build time
+Dockerfile                # Multi-stage dashboard image
+Dockerfile.recorder       # Python recorder image
+docker-compose.yml        # Local dashboard and recorder services
+PACKAGING.md              # npm, Docker, Compose, and GHCR instructions
 ```
 
 ## One-time setup
@@ -88,6 +92,50 @@ with data before the first real run happens.
 
 ---
 
+## Container images
+
+Release `v1.1.0` publishes multi-platform images for Linux AMD64 and ARM64:
+
+```text
+ghcr.io/offspring26/automation26-dashboard:v1.1.0
+ghcr.io/offspring26/automation26-recorder:v1.1.0
+```
+
+Pull an image for the current architecture:
+
+```bash
+docker pull ghcr.io/offspring26/automation26-dashboard:v1.1.0
+docker pull ghcr.io/offspring26/automation26-recorder:v1.1.0
+```
+
+Run the dashboard:
+
+```bash
+docker run --rm -p 8080:8080 \
+  ghcr.io/offspring26/automation26-dashboard:v1.1.0
+```
+
+Open <http://localhost:8080/Automation26/>.
+
+The dashboard image is built from the current execution log. The recorder image
+runs the Python execution recorder and should normally be used through Compose
+so that `data/executions.json` is mounted:
+
+```bash
+docker compose run --rm recorder
+docker compose build dashboard
+docker compose up dashboard
+```
+
+To simulate a scheduled recorder run locally:
+
+```bash
+GITHUB_EVENT_NAME=schedule docker compose run --rm recorder
+```
+
+The recorder does not commit or push changes. GitHub Actions remains responsible
+for committing the append-only execution log.
+
 ## Design notes & origin (conversation summary)
 
 This project was originally assembled in response to a design described by the repository owner. The key points and rationale from that conversation are recorded here to help future maintainers and agentic AIs understand design trade-offs and setup steps.
@@ -107,5 +155,3 @@ This project was originally assembled in response to a design described by the r
   1. Set Actions → General → Workflow permissions to "Read and write permissions" so the action can commit `data/executions.json`.
   2. Set Pages source to "GitHub Actions" in Settings → Pages so `deploy-pages.yml` can publish the dashboard.
   3. Run `npm install` once inside `app/` locally and commit `package-lock.json` (deploy workflow uses `npm ci` and requires the lockfile).
-
-If you want the conversation transcript or full original text added verbatim to the repo (for provenance), tell me and I will add it to a new file (e.g., ORIGIN.md).
