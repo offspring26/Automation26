@@ -1,19 +1,49 @@
 # AGENTS.md
 
-Purpose
--------
-This document tells agentic AIs (and human contributors acting as agents) how to continue developing and maintaining the Automation26 project safely and productively.
+## Purpose
 
-Primary goals for an agent
-- Keep the daily scheduled-execution recorder and Pages dashboard running and accurate.
-- Keep the append-only data log (data/executions.json) in a consistent, auditable state.
-- Add small, well-scoped improvements (fix UI bugs, improve charting, add tests) and propose larger changes via PRs.
+This document guides agents and human contributors maintaining Automation26.
 
-Repository / runtime summary
-- Recording script: scripts/record_execution.py (Python 3.12). Writes a single JSON object (record) appended to data/executions.json and commits the file.
-- Scheduler: .github/workflows/record-execution.yml — cron at 03:14 UTC + workflow_dispatch.
-- Dashboard: app/ — Vite + React; reads executions.json at build time and is published to GitHub Pages by .github/workflows/deploy-pages.yml.
-- Data: data/executions.json — append-only log committed by CI. Treat this file as canonical historical data.
+## Project summary
+
+- `scripts/record_execution.py` records scheduled and manual workflow runs in the append-only `data/executions.json` log.
+- `.github/workflows/record-execution.yml` runs the recorder daily at 03:14 UTC and supports manual dispatch.
+- `app/` is the Vite + React dashboard published through GitHub Pages.
+- `Dockerfile` packages the dashboard with Nginx.
+- `Dockerfile.recorder` packages the Python recorder.
+- `docker-compose.yml` provides local dashboard and recorder services.
+- `.github/workflows/publish-container-images.yml` publishes both images to GHCR.
+
+## Release 1.1 packaging status
+
+- Root and dashboard package metadata are version `1.1.0`.
+- Dashboard image: `ghcr.io/offspring26/automation26-dashboard`.
+- Recorder image: `ghcr.io/offspring26/automation26-recorder`.
+- GHCR publishing targets `linux/amd64` and `linux/arm64` using Docker Buildx.
+- Release tags use the `v1.1.0` format; the corresponding npm version is `1.1.0`.
+- The dashboard container listens on port `8080` and serves the project at `/Automation26/`.
+
+## Safety rules
+
+- Do not rewrite or reorder `data/executions.json`; changes must remain append-only with clear provenance.
+- Do not add long-lived credentials. GHCR publishing uses the workflow `GITHUB_TOKEN` with `packages: write`.
+- Changes to data-writing workflows, deployment configuration, or publishing permissions must be small, documented, and reviewed by a human before merge.
+- Do not modify historical commits. Use a documented compensating record if historical data needs correction.
+
+## Development and verification
+
+```bash
+# Dashboard
+npm install --prefix app
+npm run build
+
+# Local containers
+docker compose build
+docker compose up dashboard
+curl -fsS http://localhost:8080/healthz
+
+# Recorder, writing through the mounted data volume
+docker compose run --rm recorder
 
 Setup Status (as of 2026-09-07)
 -------------------------------
