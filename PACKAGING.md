@@ -1,12 +1,13 @@
 # Hybrid packaging
 
-This repository now includes a hybrid package for the React dashboard and Python
+This repository includes a hybrid package for the React dashboard and Python
 execution recorder:
 
 - `Dockerfile` builds the Vite dashboard and serves the static output with Nginx.
 - `Dockerfile.recorder` packages `scripts/record_execution.py` in a small Python image.
 - `docker-compose.yml` provides `dashboard` and on-demand `recorder` services.
-- The root `package.json` provides convenient npm wrappers around local and Docker commands.
+- The root `package.json` provides npm wrappers around local and Docker commands.
+- `.github/workflows/publish-container-images.yml` publishes both images to GHCR.
 
 ## Run the dashboard
 
