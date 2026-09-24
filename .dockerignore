@@ -1,0 +1,17 @@
+# Node dependencies and build output
+node_modules/
+app/node_modules/
+app/dist/
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Local and VCS metadata
+.git/
+.github/
+.env
+.DS_Store
+
+# Runtime-only data copied explicitly into the image
+app/public/executions.json

@@ -1,0 +1,15 @@
+{
+  "name": "automation26",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Automation26 execution tracker: React dashboard and Python execution recorder.",
+  "scripts": {
+    "build": "npm --prefix app run build",
+    "dev": "npm --prefix app run dev",
+    "preview": "npm --prefix app run preview",
+    "docker:build": "docker compose build",
+    "docker:up": "docker compose up dashboard",
+    "docker:record": "docker compose run --rm recorder",
+    "docker:down": "docker compose down"
+  }
+}

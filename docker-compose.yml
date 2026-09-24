@@ -1,0 +1,24 @@
+services:
+  dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: automation26-dashboard:local
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+
+  # Run on demand with: docker compose run --rm recorder
+  # The recorder updates the shared JSON log; rebuild the dashboard image to
+  # publish newly recorded data: docker compose build dashboard.
+  recorder:
+    build:
+      context: .
+      dockerfile: Dockerfile.recorder
+    image: automation26-recorder:local
+    environment:
+      GITHUB_EVENT_NAME: "${GITHUB_EVENT_NAME:-workflow_dispatch}"
+      GITHUB_RUN_ID: "${GITHUB_RUN_ID:-local}"
+      GITHUB_RUN_ATTEMPT: "${GITHUB_RUN_ATTEMPT:-1}"
+    volumes:
+      - ./data:/workspace/data
