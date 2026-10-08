@@ -262,5 +262,13 @@
     "actual_time_utc": "2026-10-07T03:26:36.877588+00:00",
     "scheduled_time_utc": "2026-10-07T03:14:00+00:00",
     "delay_seconds": 757
+  },
+  {
+    "run_id": "37722748334",
+    "run_attempt": "1",
+    "trigger": "schedule",
+    "actual_time_utc": "2026-10-08T03:26:51.497189+00:00",
+    "scheduled_time_utc": "2026-10-08T03:14:00+00:00",
+    "delay_seconds": 771
   }
 ]
