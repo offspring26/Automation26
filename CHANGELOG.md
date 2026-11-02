@@ -2,6 +2,31 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.0] - 2026-11-02
+
+### Added
+
+- Light mode support for the React dashboard with seamless toggle between dark and light themes.
+- Automatic detection of system color scheme (`prefers-color-scheme`) with persistent `localStorage` preference.
+- Theme-aware Recharts styling (grid lines, axes, text, bars, and custom tooltips adapt cleanly to light and dark themes).
+- Anti-flash script in `index.html` preventing theme flicker on initial load.
+
+### Changed
+
+- Refactored dashboard CSS to use CSS custom properties for maintainable theme variables.
+- Updated root and dashboard package versions to `1.2.0`.
+- Synchronized repository with origin changes.
+
+### Fixed
+
+- Fixed unclosed bash code block and truncated sentence in `AGENTS.md`.
+- Cleaned up untracked scratch scripts.
+
+### Container images
+
+- `ghcr.io/offspring26/automation26-dashboard:1.2.0`
+- `ghcr.io/offspring26/automation26-recorder:1.2.0`
+
 ## [1.1.0] - 2026-09-24
 
 ### Added

@@ -14,14 +14,15 @@ This document guides agents and human contributors maintaining Automation26.
 - `docker-compose.yml` provides local dashboard and recorder services.
 - `.github/workflows/publish-container-images.yml` publishes both images to GHCR.
 
-## Release 1.1 packaging status
+## Release 1.2 packaging status
 
-- Root and dashboard package metadata are version `1.1.0`.
+- Root and dashboard package metadata are version `1.2.0`.
 - Dashboard image: `ghcr.io/offspring26/automation26-dashboard`.
 - Recorder image: `ghcr.io/offspring26/automation26-recorder`.
 - GHCR publishing targets `linux/amd64` and `linux/arm64` using Docker Buildx.
-- Release tags use the `v1.1.0` format; the corresponding npm version is `1.1.0`.
+- Release tags use the `v1.2.0` format; the corresponding npm version is `1.2.0`.
 - The dashboard container listens on port `8080` and serves the project at `/Automation26/`.
+- The dashboard supports both dark and light modes with persistent toggle and system theme preference detection.
 
 ## Safety rules
 
@@ -44,4 +45,6 @@ curl -fsS http://localhost:8080/healthz
 
 # Recorder, writing through the mounted data volume
 docker compose run --rm recorder
-ons, open an issue and wait for human approval.
+```
+
+For any changes that could delete or rewrite data or escalate permissions, open an issue and wait for human approval.
