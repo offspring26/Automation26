@@ -317,31 +317,37 @@ export default function App() {
             </div>
           </div>
           <div className="chart-wrap">
-            <ResponsiveContainer width="100%" height={Math.max(360, filteredRecords.length * 44)}>
+            <ResponsiveContainer width="100%" height={400}>
               <BarChart
                 data={filteredRecords}
-                layout="vertical"
-                margin={{ top: 12, right: 24, left: 12, bottom: 28 }}
-                barCategoryGap="28%"
+                margin={{ top: 20, right: 20, left: 12, bottom: 20 }}
+                barCategoryGap="16%"
               >
-                <CartesianGrid strokeDasharray="3 3" stroke={gridStroke} horizontal={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke={gridStroke} vertical={false} />
                 <XAxis
-                  type="number"
+                  dataKey="label"
                   tick={{ fontSize: 11, fill: tickFill }}
                   axisLine={{ stroke: axisStroke }}
                   tickLine={false}
-                  label={{ value: 'Delay (minutes)', position: 'bottom', fill: tickFill, fontSize: 11 }}
+                  minTickGap={24}
                 />
                 <YAxis
-                  dataKey="label"
-                  type="category"
-                  width={132}
+                  type="number"
                   tick={{ fontSize: 11, fill: yTickFill }}
                   axisLine={false}
                   tickLine={false}
+                  label={{
+                    value: 'Delay (minutes)',
+                    angle: -90,
+                    position: 'insideLeft',
+                    offset: 14,
+                    fill: tickFill,
+                    fontSize: 11,
+                    style: { textAnchor: 'middle' },
+                  }}
                 />
                 <Tooltip content={<CustomTooltip />} />
-                <Bar dataKey="delayMinutes" name="Delay (minutes)">
+                <Bar dataKey="delayMinutes" name="Delay (minutes)" radius={[4, 4, 0, 0]}>
                   {filteredRecords.map((entry, i) => (
                     <Cell
                       key={entry.run_id || i}
