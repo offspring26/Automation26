@@ -114,6 +114,13 @@ body {
   flex-wrap: wrap;
 }
 
+.eyebrow-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
 .eyebrow,
 .panel-kicker {
   color: var(--text-subtle);
@@ -121,6 +128,26 @@ body {
   font-weight: 700;
   letter-spacing: 0.14em;
   margin: 0 0 12px;
+}
+
+.eyebrow-row .eyebrow {
+  margin: 0;
+}
+
+.version-tag {
+  display: inline-flex;
+  align-items: center;
+  background: var(--badge-bg);
+  border: 1px solid var(--badge-border);
+  border-radius: 999px;
+  color: var(--text-muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 2px 8px;
+  line-height: 1.4;
+  transition: all 0.2s ease;
 }
 
 .hero h1 {
@@ -378,6 +405,35 @@ body {
   color: var(--text-muted);
   margin: 24px 0;
   padding: 18px 20px;
+}
+
+.page-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 56px;
+  padding-top: 24px;
+  border-top: 1px solid var(--card-border);
+  color: var(--text-subtle);
+  font-size: 0.8rem;
+  transition: border-color 0.2s ease;
+}
+
+.footer-dot {
+  opacity: 0.5;
+}
+
+.page-footer a {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.15s ease;
+}
+
+.page-footer a:hover {
+  color: var(--text-main);
+  text-decoration: underline;
 }
 
 @media (max-width: 640px) {

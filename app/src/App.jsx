@@ -10,6 +10,9 @@ import {
   Cell,
 } from 'recharts'
 
+/* global __APP_VERSION__ */
+const APP_VERSION = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '1.3.0'
+
 function formatTimeLabel(isoString) {
   const d = new Date(isoString)
   return d.toLocaleString(undefined, {
@@ -31,6 +34,7 @@ function formatDateLabel(isoString) {
 function CustomTooltip({ active, payload }) {
   if (!active || !payload || !payload.length) return null
   const record = payload[0].payload
+  if (!record) return null
   return (
     <div className="tooltip" role="status">
       <div className="tooltip-title">{formatDateLabel(record.actual_time_utc)}</div>
@@ -135,7 +139,12 @@ export default function App() {
     <div className="page">
       <header className="hero">
         <div>
-          <p className="eyebrow">AUTOMATION26 / OPERATIONS</p>
+          <div className="eyebrow-row">
+            <p className="eyebrow">AUTOMATION26 / OPERATIONS</p>
+            <span className="version-tag" title={`Version ${APP_VERSION}`}>
+              v{APP_VERSION}
+            </span>
+          </div>
           <h1>Execution timing</h1>
           <p className="subtitle">
             A daily view of how reliably the scheduled workflow starts at its
@@ -301,6 +310,18 @@ export default function App() {
           </div>
         </section>
       )}
+
+      <footer className="page-footer">
+        <span>Automation26 Dashboard v{APP_VERSION}</span>
+        <span className="footer-dot">•</span>
+        <a
+          href="https://github.com/offspring26/Automation26"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          GitHub Repository
+        </a>
+      </footer>
     </div>
   )
 }

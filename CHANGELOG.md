@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.0] - 2026-11-02
+
+### Added
+
+- Version number badge displayed in the header and footer of the generated dashboard website.
+- GitHub Pages deployment trigger on push to `main` and release tags in `.github/workflows/deploy-pages.yml` so that code updates deploy immediately to GitHub Pages.
+
+### Changed
+
+- **Recharts v3 Upgrade**: Upgraded `recharts` from `^2.12.7` to `^3.10.1`, removing deprecation warnings and reducing bundle module overhead.
+- **Bundle Optimization & Code Splitting**: Configured Vite Rollup `manualChunks` in `vite.config.js` to split vendor code into `vendor-react`, `vendor-d3`, and `vendor-recharts`, reducing main app bundle to ~8 kB and eliminating chunk size warnings.
+- Updated package versions to `1.3.0`.
+
+### Container images
+
+- `ghcr.io/offspring26/automation26-dashboard:1.3.0`
+- `ghcr.io/offspring26/automation26-recorder:1.3.0`
+
 ## [1.2.0] - 2026-11-02
 
 ### Added

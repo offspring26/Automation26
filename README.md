@@ -92,25 +92,25 @@ with data before the first real run happens.
 
 ## Container images
 
-Release `v1.2.0` publishes multi-platform images for Linux AMD64 and ARM64:
+Release `v1.3.0` publishes multi-platform images for Linux AMD64 and ARM64:
 
 ```text
-ghcr.io/offspring26/automation26-dashboard:v1.2.0
-ghcr.io/offspring26/automation26-recorder:v1.2.0
+ghcr.io/offspring26/automation26-dashboard:v1.3.0
+ghcr.io/offspring26/automation26-recorder:v1.3.0
 ```
 
 Pull an image for the current architecture:
 
 ```bash
-docker pull ghcr.io/offspring26/automation26-dashboard:v1.2.0
-docker pull ghcr.io/offspring26/automation26-recorder:v1.2.0
+docker pull ghcr.io/offspring26/automation26-dashboard:v1.3.0
+docker pull ghcr.io/offspring26/automation26-recorder:v1.3.0
 ```
 
 Run the dashboard:
 
 ```bash
 docker run --rm -p 8080:8080 \
-  ghcr.io/offspring26/automation26-dashboard:v1.2.0
+  ghcr.io/offspring26/automation26-dashboard:v1.3.0
 ```
 
 Open <http://localhost:8080/Automation26/>.

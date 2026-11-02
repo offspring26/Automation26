@@ -1,6 +1,11 @@
 name: Deploy updated Pages
 
 on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*.*.*'
   workflow_run:
     workflows: ["Record Scheduled Execution"]
     types:
@@ -18,7 +23,7 @@ concurrency:
 
 jobs:
   build:
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
