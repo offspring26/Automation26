@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.4.0] - 2026-11-02
+
+### Added
+
+- **Time-Range Filtering**: Added time-window selectors (`7 Days`, `30 Days`, `90 Days`, `All Time`) to the dashboard, keeping chart height compact and readable as historical logs grow.
+- **Trend Analysis & 7-Run Rolling Average**: Added rolling delay calculation and a 7-run trend stat card displaying delay drift direction (`↑`, `↓`, `→`) and rolling averages in tooltips.
+- **Health Status Indicator & Delay Thresholds**: Added a real-time status badge in the header categorizing the latest scheduled execution (`Healthy`, `Moderate Delay`, `Elevated Delay`) with visual warning cues for runs with delay ≥ 10 minutes.
+- **Recorder Unit Test Suite**: Added comprehensive unit tests in `tests/test_record_execution.py` verifying delay calculation, day boundaries, and trigger handling.
+- **Data Schema Validation**: Added `scripts/validate_executions.py` to validate record schemas, ISO timestamps, and delay integrity in `data/executions.json`, integrated directly into `record-execution.yml`.
+- **Frontend Test Suite & CI Verification**: Added `app/src/analytics.test.js` using Node's native test runner, combined `npm test` script across Python, data validation, and JavaScript, and added `.github/workflows/ci.yml` for automated CI validation.
+
+### Changed
+
+- Updated version metadata to `1.4.0` across root and dashboard packages.
+- Modularized recorder script with testable `build_record` helper.
+
+### Container images
+
+- `ghcr.io/offspring26/automation26-dashboard:1.4.0`
+- `ghcr.io/offspring26/automation26-recorder:1.4.0`
+
 ## [1.3.0] - 2026-11-02
 
 ### Added

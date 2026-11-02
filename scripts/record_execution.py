@@ -32,11 +32,15 @@ def save_data(data):
         f.write("\n")
 
 
-def main():
-    now = datetime.now(timezone.utc)
-    event_name = os.environ.get("GITHUB_EVENT_NAME", "unknown")
-    run_id = os.environ.get("GITHUB_RUN_ID", "")
-    run_attempt = os.environ.get("GITHUB_RUN_ATTEMPT", "1")
+def build_record(now=None, event_name=None, run_id=None, run_attempt=None):
+    if now is None:
+        now = datetime.now(timezone.utc)
+    if event_name is None:
+        event_name = os.environ.get("GITHUB_EVENT_NAME", "unknown")
+    if run_id is None:
+        run_id = os.environ.get("GITHUB_RUN_ID", "")
+    if run_attempt is None:
+        run_attempt = os.environ.get("GITHUB_RUN_ATTEMPT", "1")
 
     is_scheduled = event_name == "schedule"
 
@@ -65,6 +69,11 @@ def main():
         record["scheduled_time_utc"] = scheduled.isoformat()
         record["delay_seconds"] = delay_seconds
 
+    return record
+
+
+def main():
+    record = build_record()
     data = load_data()
     data.append(record)
     save_data(data)

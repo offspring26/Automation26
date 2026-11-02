@@ -9,32 +9,23 @@ import {
   ResponsiveContainer,
   Cell,
 } from 'recharts'
+import {
+  formatDateLabel,
+  formatTimeLabel,
+  filterRecordsByRange,
+  calculateRollingAverage,
+  computeStats,
+  getHealthStatus,
+} from './analytics'
 
 /* global __APP_VERSION__ */
-const APP_VERSION = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '1.3.0'
-
-function formatTimeLabel(isoString) {
-  const d = new Date(isoString)
-  return d.toLocaleString(undefined, {
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
-}
-
-function formatDateLabel(isoString) {
-  return new Date(isoString).toLocaleDateString(undefined, {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  })
-}
+const APP_VERSION = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '1.4.0'
 
 function CustomTooltip({ active, payload }) {
   if (!active || !payload || !payload.length) return null
   const record = payload[0].payload
   if (!record) return null
+  const isHighDelay = record.delayMinutes != null && record.delayMinutes >= 10
   return (
     <div className="tooltip" role="status">
       <div className="tooltip-title">{formatDateLabel(record.actual_time_utc)}</div>
@@ -51,8 +42,17 @@ function CustomTooltip({ active, payload }) {
           </div>
           <div className="tooltip-row">
             <span>Delay</span>
-            <strong>{record.delayMinutesLabel}</strong>
+            <strong className={isHighDelay ? 'delay-warning' : ''}>
+              {record.delayMinutesLabel}
+              {isHighDelay ? ' ⚠️' : ''}
+            </strong>
           </div>
+          {record.rollingAvgMinutes != null && (
+            <div className="tooltip-row">
+              <span>7-run avg</span>
+              <strong>{record.rollingAvgMinutes.toFixed(1)} min</strong>
+            </div>
+          )}
         </>
       )}
     </div>
@@ -67,9 +67,10 @@ function getInitialTheme() {
 }
 
 export default function App() {
-  const [records, setRecords] = useState(null)
+  const [allRecords, setAllRecords] = useState(null)
   const [error, setError] = useState(null)
   const [theme, setTheme] = useState(getInitialTheme)
+  const [timeRange, setTimeRange] = useState('30D')
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
@@ -97,35 +98,31 @@ export default function App() {
         if (!res.ok) throw new Error(`Failed to load data: ${res.status}`)
         return res.json()
       })
-      .then(setRecords)
+      .then(setAllRecords)
       .catch((err) => setError(err.message))
   }, [])
 
-  const chartData = useMemo(() => {
-    if (!records) return []
-    return records.map((r) => {
-      const delayMinutes = r.delay_seconds != null ? r.delay_seconds / 60 : null
-      return {
-        ...r,
-        delayMinutes,
-        delayMinutesLabel:
-          delayMinutes != null ? `${delayMinutes.toFixed(1)} min` : 'n/a',
-        label: formatTimeLabel(r.actual_time_utc),
-      }
-    })
-  }, [records])
+  // 1. Calculate rolling averages across full historical series
+  const enrichedRecords = useMemo(() => {
+    if (!allRecords) return []
+    return calculateRollingAverage(allRecords, 7)
+  }, [allRecords])
 
-  const scheduledOnly = chartData.filter((r) => r.trigger === 'schedule')
-  const manualCount = chartData.length - scheduledOnly.length
+  // 2. Filter for active time range
+  const filteredRecords = useMemo(() => {
+    return filterRecordsByRange(enrichedRecords, timeRange)
+  }, [enrichedRecords, timeRange])
 
+  // 3. Compute summary statistics
   const stats = useMemo(() => {
-    if (!scheduledOnly.length) return null
-    const delays = scheduledOnly.map((r) => r.delayMinutes)
-    const avg = delays.reduce((a, b) => a + b, 0) / delays.length
-    const max = Math.max(...delays)
-    const min = Math.min(...delays)
-    return { avg, max, min, count: scheduledOnly.length }
-  }, [scheduledOnly])
+    return computeStats(filteredRecords)
+  }, [filteredRecords])
+
+  // 4. Compute overall health status from latest scheduled run
+  const overallStats = useMemo(() => {
+    return computeStats(enrichedRecords)
+  }, [enrichedRecords])
+  const health = useMemo(() => getHealthStatus(overallStats), [overallStats])
 
   const isLight = theme === 'light'
   const gridStroke = isLight ? '#e2e8f0' : '#29303d'
@@ -133,7 +130,14 @@ export default function App() {
   const tickFill = isLight ? '#64748b' : '#8490a3'
   const yTickFill = isLight ? '#334155' : '#b7c0cf'
   const scheduleColor = isLight ? '#2563eb' : '#4f7cff'
+  const elevatedColor = isLight ? '#d97706' : '#f59e0b'
   const dispatchColor = isLight ? '#94a3b8' : '#737e8e'
+
+  const getBarColor = (entry) => {
+    if (entry.trigger !== 'schedule') return dispatchColor
+    if (entry.delayMinutes != null && entry.delayMinutes >= 10) return elevatedColor
+    return scheduleColor
+  }
 
   return (
     <div className="page">
@@ -152,6 +156,17 @@ export default function App() {
           </p>
         </div>
         <div className="header-actions">
+          <div className="health-badge" title="Status of latest scheduled run">
+            <span
+              className="status-dot"
+              style={{
+                backgroundColor: health.color,
+                boxShadow: `0 0 0 4px ${health.glow}`,
+              }}
+            />
+            <span>{health.label}</span>
+            <strong>{health.sublabel}</strong>
+          </div>
           <div className="schedule-badge">
             <span className="status-dot" />
             <span>Daily schedule</span>
@@ -210,25 +225,44 @@ export default function App() {
       </header>
 
       <section className="intro-panel" aria-label="Dashboard summary">
-        <div>
+        <div className="intro-info">
           <span className="panel-kicker">RUN HISTORY</span>
           <p>
             Bars show the delay before each scheduled run started. Manual
             workflow dispatches are retained for context and shown in grey.
           </p>
         </div>
-        {records && (
-          <span className="record-count">
-            {records.length} {records.length === 1 ? 'record' : 'records'}
-          </span>
-        )}
+        <div className="filter-toolbar">
+          <div className="filter-group" role="group" aria-label="Time range selector">
+            {[
+              { id: '7D', label: '7 Days' },
+              { id: '30D', label: '30 Days' },
+              { id: '90D', label: '90 Days' },
+              { id: 'ALL', label: 'All Time' },
+            ].map(({ id, label }) => (
+              <button
+                key={id}
+                type="button"
+                className={`filter-btn ${timeRange === id ? 'active' : ''}`}
+                onClick={() => setTimeRange(id)}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+          {allRecords && (
+            <span className="record-count">
+              Showing {filteredRecords.length} of {allRecords.length} records
+            </span>
+          )}
+        </div>
       </section>
 
       {error && <div className="error">Couldn't load execution data: {error}</div>}
 
-      {!error && !records && <div className="loading">Loading execution log…</div>}
+      {!error && !allRecords && <div className="loading">Loading execution log…</div>}
 
-      {records && records.length === 0 && (
+      {allRecords && allRecords.length === 0 && (
         <div className="empty">
           No executions recorded yet. Once the scheduled workflow runs (or is
           dispatched manually), data will appear here.
@@ -253,14 +287,23 @@ export default function App() {
             <span className="stat-value">{stats.max.toFixed(1)}m</span>
             <span className="stat-label">max delay</span>
           </div>
+          <div className="stat">
+            <span className={`stat-value stat-trend-${stats.trendDirection}`}>
+              {stats.trendDirection === 'up' && '↑ '}
+              {stats.trendDirection === 'down' && '↓ '}
+              {stats.trendDirection === 'steady' && '→ '}
+              {stats.trend}
+            </span>
+            <span className="stat-label">7-run trend</span>
+          </div>
           <div className="stat stat-muted">
-            <span className="stat-value">{manualCount}</span>
+            <span className="stat-value">{stats.manualCount}</span>
             <span className="stat-label">manual runs</span>
           </div>
         </div>
       )}
 
-      {chartData.length > 0 && (
+      {filteredRecords.length > 0 && (
         <section className="chart-card" aria-label="Execution delay chart">
           <div className="chart-heading">
             <div>
@@ -269,44 +312,45 @@ export default function App() {
             </div>
             <div className="chart-key">
               <span><i className="key-swatch scheduled" /> Scheduled</span>
+              <span><i className="key-swatch elevated" /> Delay ≥10m</span>
               <span><i className="key-swatch manual" /> Manual</span>
             </div>
           </div>
           <div className="chart-wrap">
-          <ResponsiveContainer width="100%" height={Math.max(360, chartData.length * 48)}>
-            <BarChart
-              data={chartData}
-              layout="vertical"
-              margin={{ top: 12, right: 24, left: 12, bottom: 28 }}
-              barCategoryGap="28%"
-            >
-              <CartesianGrid strokeDasharray="3 3" stroke={gridStroke} horizontal={false} />
-              <XAxis
-                type="number"
-                tick={{ fontSize: 11, fill: tickFill }}
-                axisLine={{ stroke: axisStroke }}
-                tickLine={false}
-                label={{ value: 'Delay (minutes)', position: 'bottom', fill: tickFill, fontSize: 11 }}
-              />
-              <YAxis
-                dataKey="label"
-                type="category"
-                width={132}
-                tick={{ fontSize: 11, fill: yTickFill }}
-                axisLine={false}
-                tickLine={false}
-              />
-              <Tooltip content={<CustomTooltip />} />
-              <Bar dataKey="delayMinutes" name="Delay (minutes)">
-                {chartData.map((entry, i) => (
-                  <Cell
-                    key={entry.run_id || i}
-                    fill={entry.trigger === 'schedule' ? scheduleColor : dispatchColor}
-                  />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
+            <ResponsiveContainer width="100%" height={Math.max(360, filteredRecords.length * 44)}>
+              <BarChart
+                data={filteredRecords}
+                layout="vertical"
+                margin={{ top: 12, right: 24, left: 12, bottom: 28 }}
+                barCategoryGap="28%"
+              >
+                <CartesianGrid strokeDasharray="3 3" stroke={gridStroke} horizontal={false} />
+                <XAxis
+                  type="number"
+                  tick={{ fontSize: 11, fill: tickFill }}
+                  axisLine={{ stroke: axisStroke }}
+                  tickLine={false}
+                  label={{ value: 'Delay (minutes)', position: 'bottom', fill: tickFill, fontSize: 11 }}
+                />
+                <YAxis
+                  dataKey="label"
+                  type="category"
+                  width={132}
+                  tick={{ fontSize: 11, fill: yTickFill }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <Tooltip content={<CustomTooltip />} />
+                <Bar dataKey="delayMinutes" name="Delay (minutes)">
+                  {filteredRecords.map((entry, i) => (
+                    <Cell
+                      key={entry.run_id || i}
+                      fill={getBarColor(entry)}
+                    />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
           </div>
         </section>
       )}

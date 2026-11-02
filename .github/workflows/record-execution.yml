@@ -37,6 +37,9 @@ jobs:
           GITHUB_RUN_ATTEMPT: ${{ github.run_attempt }}
         run: python3 scripts/record_execution.py
 
+      - name: Validate executions data
+        run: python3 scripts/validate_executions.py
+
       - name: Commit and push updated log
         run: |
           git config user.name "github-actions[bot]"

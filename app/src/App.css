@@ -165,6 +165,7 @@ body {
   max-width: 560px;
 }
 
+.health-badge,
 .schedule-badge {
   align-items: center;
   background: var(--badge-bg);
@@ -180,6 +181,7 @@ body {
   transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }
 
+.health-badge strong,
 .schedule-badge strong {
   color: var(--badge-strong);
   font-weight: 600;
@@ -240,19 +242,72 @@ body {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
-.intro-panel p {
+.intro-info p {
   color: var(--intro-text);
   font-size: 0.9rem;
   line-height: 1.55;
   margin: 0;
-  max-width: 720px;
+  max-width: 620px;
+}
+
+.filter-toolbar {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.filter-group {
+  display: inline-flex;
+  background: var(--stat-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  padding: 3px;
+  gap: 2px;
+}
+
+.filter-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.72rem;
+  font-weight: 500;
+  padding: 5px 10px;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.filter-btn:hover {
+  color: var(--text-main);
+}
+
+.filter-btn.active {
+  background: var(--badge-bg);
+  border-color: var(--badge-border);
+  color: var(--badge-strong);
+  font-weight: 600;
 }
 
 .record-count {
-  color: var(--record-count-color);
-  font-size: 0.8rem;
-  font-weight: 600;
+  color: var(--text-subtle);
+  font-size: 0.75rem;
+  font-weight: 500;
   white-space: nowrap;
+}
+
+.stat-trend-up {
+  color: #f59e0b;
+}
+
+.stat-trend-down {
+  color: #10b981;
+}
+
+.stat-trend-steady {
+  color: var(--text-muted);
 }
 
 .stats {
@@ -346,8 +401,16 @@ body {
   background: var(--key-scheduled);
 }
 
+.key-swatch.elevated {
+  background: #f59e0b;
+}
+
 .key-swatch.manual {
   background: var(--key-manual);
+}
+
+.delay-warning {
+  color: #f59e0b !important;
 }
 
 .chart-wrap {
@@ -462,8 +525,23 @@ body {
   }
 
   .intro-panel {
-    gap: 14px;
+    gap: 16px;
     padding: 18px;
+  }
+
+  .filter-toolbar {
+    width: 100%;
+    align-items: flex-start;
+  }
+
+  .filter-group {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .filter-btn {
+    flex: 1;
+    text-align: center;
   }
 
   .chart-heading {

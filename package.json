@@ -1,9 +1,10 @@
 {
   "name": "automation26",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "private": true,
   "description": "Automation26 execution tracker: React dashboard and Python execution recorder.",
   "scripts": {
+    "test": "python3 -m unittest discover -s tests && python3 scripts/validate_executions.py && npm --prefix app test",
     "build": "npm --prefix app run build",
     "dev": "npm --prefix app run dev",
     "preview": "npm --prefix app run preview",
