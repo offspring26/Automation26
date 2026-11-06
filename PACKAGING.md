@@ -42,8 +42,10 @@ repository's append-only data workflow.
 
 ```bash
 npm install --prefix app
-npm run dev
+npm run sync-data  # syncs canonical data to app/public/ for local dev
+npm run dev        # automatically syncs data and launches Vite
 npm run build
+npm test
 ```
 
 The existing GitHub Pages workflow remains unchanged and continues to be the

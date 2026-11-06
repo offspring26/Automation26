@@ -21,10 +21,17 @@ export function filterRecordsByRange(records, range) {
   if (range === 'ALL') return records
 
   const days = range === '7D' ? 7 : range === '30D' ? 30 : range === '90D' ? 90 : 30
-  const latestTimestamp = new Date(records[records.length - 1].actual_time_utc).getTime()
+  const lastRecord = records[records.length - 1]
+  if (!lastRecord || !lastRecord.actual_time_utc) return []
+  const latestTimestamp = new Date(lastRecord.actual_time_utc).getTime()
+  if (Number.isNaN(latestTimestamp)) return []
   const cutoffTime = latestTimestamp - days * 24 * 60 * 60 * 1000
 
-  return records.filter((r) => new Date(r.actual_time_utc).getTime() >= cutoffTime)
+  return records.filter((r) => {
+    if (!r || !r.actual_time_utc) return false
+    const t = new Date(r.actual_time_utc).getTime()
+    return !Number.isNaN(t) && t >= cutoffTime
+  })
 }
 
 export function calculateRollingAverage(records, windowSize = 7) {

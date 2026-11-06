@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.5.0] - 2026-11-06
+
+### Added
+
+- **Local Data Synchronization**: Added `scripts/sync_data.py` and `npm run sync-data` (plus automated `predev` sync in `app/package.json`) to copy canonical `data/executions.json` into `app/public/executions.json` so local development accurately previews production execution data.
+- **Data Growth Monitoring**: Added storage size reporting to `scripts/validate_executions.py` to continuously track data file size (KB) on validation passes.
+- **Architecture Decision Records (ADRs)**: Added `docs/ADR.md` establishing policies to defer unnecessary data restructuring while monitoring growth (ADR 0001) and standardizing runtime versions (ADR 0002).
+- **Unit Test Coverage for Data Sync**: Added `tests/test_sync_data.py` testing data copying, error handling, and directory creation.
+- **Accessibility & Defensive Analytics**: Added `aria-pressed` state attributes to time-range filter buttons in `App.jsx`, and added resilient timestamp checks in `filterRecordsByRange`.
+
+### Changed
+
+- **GitHub Pages Deployment Path Filters**: Added path filters (`data/executions.json`, `app/**`, `.github/workflows/deploy-pages.yml`) to `.github/workflows/deploy-pages.yml` to prevent redundant builds on doc-only pushes while maintaining `workflow_run` triggers for scheduled runs.
+- **Node Runtime Alignment**: Standardized Node 24 across CI (`.github/workflows/ci.yml`), GitHub Pages deployment (`deploy-pages.yml`), and Dockerfile (`node:24-alpine`).
+- **Dockerfile Health Check Alignment**: Updated container health check to ping `/healthz` directly instead of `/Automation26/`, matching `docker/nginx.conf` and eliminating access log clutter.
+- **Recorder Container Image Packaging**: Packaged the entire `scripts/` directory into `Dockerfile.recorder`.
+- **Documentation & Lockfile Instructions**: Updated `README.md` to remove stale lockfile generation steps, clarify Pages triggers, document the new `sync-data` command, and bump container tags to `v1.5.0`.
+- Updated package versions to `1.5.0` across root and dashboard packages.
+
+### Container images
+
+- `ghcr.io/offspring26/automation26-dashboard:1.5.0`
+- `ghcr.io/offspring26/automation26-recorder:1.5.0`
+
 ## [1.4.0] - 2026-11-02
 
 ### Added

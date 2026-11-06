@@ -20,9 +20,11 @@ minutes) per scheduled run.
 ```
 .github/workflows/
   record-execution.yml    # cron '14 3 * * *' + workflow_dispatch → appends to data/executions.json
-  deploy-pages.yml        # on push to data/executions.json or app/** → builds + deploys app/
+  deploy-pages.yml        # on push to data/executions.json, app/** or on recorder completion → builds + deploys app/
 scripts/
   record_execution.py     # computes actual vs scheduled time, appends the record
+  validate_executions.py  # validates schema, timestamps, and checks storage size
+  sync_data.py            # syncs data/executions.json to app/public/ for local development
 data/
   executions.json         # the "database" — append-only JSON log, committed by CI
 app/                      # Vite + React dashboard, fetches data/executions.json at build time
@@ -52,14 +54,9 @@ PACKAGING.md              # npm, Docker, Compose, and GHCR instructions
    `https://offspring26.github.io/Automation26/`. If you ever rename the
    repo, update this to match.
 
-5. **Generate a lockfile once**, since `deploy-pages.yml` uses `npm ci`
-   (which requires `package-lock.json`):
+5. **Install dependencies.** The lockfile (`app/package-lock.json`) is already committed:
    ```bash
-   cd app
-   npm install
-   git add package-lock.json
-   git commit -m "chore: add lockfile"
-   git push
+   npm install --prefix app
    ```
 
 6. **Trigger it.** Either wait for 03:14 UTC, or go to
@@ -78,39 +75,42 @@ chart in grey with no bar height.
 ## Local development
 
 ```bash
+npm run dev
+```
+
+Running `npm run dev` (or `npm run sync-data`) automatically synchronizes
+`data/executions.json` into `app/public/executions.json`, allowing you to
+immediately preview the canonical execution history. Alternatively:
+
+```bash
 cd app
 npm install
 npm run dev
 ```
 
-The dev server reads `app/public/executions.json` (currently an empty
-array as a placeholder) — drop some sample records in there matching the
-schema used in `data/executions.json` if you want to preview the chart
-with data before the first real run happens.
-
 ---
 
 ## Container images
 
-Release `v1.4.0` publishes multi-platform images for Linux AMD64 and ARM64:
+Release `v1.5.0` publishes multi-platform images for Linux AMD64 and ARM64:
 
 ```text
-ghcr.io/offspring26/automation26-dashboard:v1.4.0
-ghcr.io/offspring26/automation26-recorder:v1.4.0
+ghcr.io/offspring26/automation26-dashboard:v1.5.0
+ghcr.io/offspring26/automation26-recorder:v1.5.0
 ```
 
 Pull an image for the current architecture:
 
 ```bash
-docker pull ghcr.io/offspring26/automation26-dashboard:v1.4.0
-docker pull ghcr.io/offspring26/automation26-recorder:v1.4.0
+docker pull ghcr.io/offspring26/automation26-dashboard:v1.5.0
+docker pull ghcr.io/offspring26/automation26-recorder:v1.5.0
 ```
 
 Run the dashboard:
 
 ```bash
 docker run --rm -p 8080:8080 \
-  ghcr.io/offspring26/automation26-dashboard:v1.4.0
+  ghcr.io/offspring26/automation26-dashboard:v1.5.0
 ```
 
 Open <http://localhost:8080/Automation26/>.
@@ -142,7 +142,7 @@ This project was originally assembled in response to a design described by the r
 
 - How it works (summary):
   - `.github/workflows/record-execution.yml` runs daily at `03:14 UTC` (cron `14 3 * * *`) and on manual `workflow_dispatch`. It runs `scripts/record_execution.py` which calculates the actual execution timestamp, computes delay vs scheduled time, and appends a record to `data/executions.json`. The workflow commits and pushes the updated JSON back to the repo.
-  - `.github/workflows/deploy-pages.yml` rebuilds the Vite/React dashboard and deploys it to GitHub Pages whenever `data/executions.json` (or the `app/` source) changes.
+  - `.github/workflows/deploy-pages.yml` rebuilds the Vite/React dashboard and deploys it to GitHub Pages whenever `data/executions.json` (or the `app/` source) changes, or upon successful completion of the recorder workflow.
   - `app/` is a Vite + React dashboard that reads the JSON at build time and renders a bar chart of delays.
 
 - Confirmed behaviors:
@@ -152,4 +152,4 @@ This project was originally assembled in response to a design described by the r
 - Required manual setup steps (recap):
   1. Set Actions → General → Workflow permissions to "Read and write permissions" so the action can commit `data/executions.json`.
   2. Set Pages source to "GitHub Actions" in Settings → Pages so `deploy-pages.yml` can publish the dashboard.
-  3. Run `npm install` once inside `app/` locally and commit `package-lock.json` (deploy workflow uses `npm ci` and requires the lockfile).
+  3. Run `npm install` inside `app/` (the lockfile is pre-committed in the repository).

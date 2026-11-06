@@ -14,16 +14,16 @@ This document guides agents and human contributors maintaining Automation26.
 - `docker-compose.yml` provides local dashboard and recorder services.
 - `.github/workflows/publish-container-images.yml` publishes both images to GHCR.
 
-## Release 1.4 packaging status
+## Release 1.5 packaging status
 
-- Root and dashboard package metadata are version `1.4.0`.
+- Root and dashboard package metadata are version `1.5.0`.
 - Dashboard image: `ghcr.io/offspring26/automation26-dashboard`.
 - Recorder image: `ghcr.io/offspring26/automation26-recorder`.
 - GHCR publishing targets `linux/amd64` and `linux/arm64` using Docker Buildx.
-- Release tags use the `v1.4.0` format; the corresponding npm version is `1.4.0`.
-- The dashboard container listens on port `8080` and serves the project at `/Automation26/`.
+- Release tags use the `v1.5.0` format; the corresponding npm version is `1.5.0`.
+- The dashboard container listens on port `8080`, serves the project at `/Automation26/`, and health checks at `/healthz`.
 - The dashboard includes time-range filtering, 7-run rolling average trends, health status indicator badges, dark/light theme switching, Recharts v3, and vendor chunk code splitting.
-- Includes automated test suite (`npm test`), Python unit tests, data schema validation, and CI verification workflow.
+- Includes automated test suite (`npm test`), Python unit tests, data schema validation with size metrics, data synchronization (`npm run sync-data`), and CI verification workflow on Node 24.
 
 ## Safety rules
 

@@ -1,7 +1,7 @@
 FROM python:3.12-alpine
 
 WORKDIR /workspace
-COPY scripts/record_execution.py ./scripts/record_execution.py
+COPY scripts/ ./scripts/
 
 # Mount ./data at /workspace/data when running the recorder.
 ENV PYTHONUNBUFFERED=1

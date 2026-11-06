@@ -1,9 +1,11 @@
 {
   "name": "automation26-dashboard",
   "private": true,
-  "version": "1.4.0",
+  "version": "1.5.0",
   "type": "module",
   "scripts": {
+    "sync-data": "node -e \"const fs=require('fs'),path=require('path');const src=path.resolve('../data/executions.json'),dest=path.resolve('public/executions.json');if(fs.existsSync(src)){fs.mkdirSync(path.dirname(dest),{recursive:true});fs.copyFileSync(src,dest);console.log('Synced executions data to '+dest);}\"",
+    "predev": "npm run sync-data",
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",

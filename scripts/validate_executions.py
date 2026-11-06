@@ -3,6 +3,7 @@ Validates schema and data integrity of data/executions.json.
 """
 
 import json
+import os
 import sys
 from datetime import datetime
 
@@ -87,7 +88,9 @@ def validate_file(path=DATA_PATH):
             print(f"  - {err}", file=sys.stderr)
         return False
 
-    print(f"Validation passed: {len(data)} records in {path} are valid.")
+    size_bytes = os.path.getsize(path) if os.path.exists(path) else 0
+    size_kb = size_bytes / 1024
+    print(f"Validation passed: {len(data)} records in {path} are valid ({size_kb:.1f} KB).")
     return True
 
 

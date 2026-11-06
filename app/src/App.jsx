@@ -19,7 +19,7 @@ import {
 } from './analytics'
 
 /* global __APP_VERSION__ */
-const APP_VERSION = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '1.4.0'
+const APP_VERSION = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '1.5.0'
 
 function CustomTooltip({ active, payload }) {
   if (!active || !payload || !payload.length) return null
@@ -245,6 +245,7 @@ export default function App() {
                 type="button"
                 className={`filter-btn ${timeRange === id ? 'active' : ''}`}
                 onClick={() => setTimeRange(id)}
+                aria-pressed={timeRange === id}
               >
                 {label}
               </button>

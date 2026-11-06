@@ -30,6 +30,9 @@ test('filterRecordsByRange filters by days relative to latest timestamp', () => 
   assert.equal(filterRecordsByRange(sample, 'ALL').length, 4)
   assert.equal(filterRecordsByRange(sample, '7D').length, 2)
   assert.equal(filterRecordsByRange(sample, '30D').length, 3)
+  assert.deepEqual(filterRecordsByRange([], '7D'), [])
+  assert.deepEqual(filterRecordsByRange(null, '7D'), [])
+  assert.deepEqual(filterRecordsByRange([{ actual_time_utc: 'invalid-date' }], '7D'), [])
 })
 
 test('calculateRollingAverage calculates 7-run rolling average', () => {
